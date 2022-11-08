@@ -10,7 +10,7 @@ Instale as dependências:
 
 - ### `yarn install ou somente yarn`
 
-Execute o projeto:
+Acesse a pasta do projeto e execute o comando abaixo:
 
 - ### `yarn dev`
 
