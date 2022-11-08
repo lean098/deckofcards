@@ -7,7 +7,6 @@ import {
   ImageList,
   ImageListItem,
   ImageListItemBar,
-  Typography,
 } from "@mui/material";
 
 import { useLocation } from "react-router-dom";
@@ -17,10 +16,11 @@ import { shuffle } from "lodash";
 import api from "../../services/api";
 
 import Header from "../../components/Header";
+import CardSkeleton from "../../components/CardSkeleton";
 
 import useStyles from "./styles";
 
-interface DeckInterface {
+export interface DeckInterface {
   code: string;
   image: string;
   images: {
@@ -37,6 +37,7 @@ const Dashboard: React.FC = () => {
 
   const [cards, setCards] = useState<DeckInterface[]>([]);
   const [times, setTImes] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   async function getDeckId() {
     const { status, data } = await api.get(`/deck/new/shuffle/?deck_count=1`);
@@ -54,6 +55,7 @@ const Dashboard: React.FC = () => {
     );
 
     if (status === 200) {
+      setLoading(false);
       return data.cards as DeckInterface[];
     }
 
@@ -83,15 +85,12 @@ const Dashboard: React.FC = () => {
     <Fragment>
       <Header userName={location.state.userName} />
 
-      {!cards && (
-        <Grid container justifyContent="center" alignItems="center">
-          <Typography>Aguarde...</Typography>
-        </Grid>
-      )}
-
       <Container>
+        {loading && <CardSkeleton />}
+
         <ImageList className={classes.imageList}>
-          {Array.isArray(cards) &&
+          {!loading &&
+            Array.isArray(cards) &&
             cards.map((card) => (
               <ImageListItem key={card.code}>
                 <img
@@ -117,7 +116,7 @@ const Dashboard: React.FC = () => {
 
         <Grid container justifyContent="space-between" alignItems="center">
           <Button
-            disabled={times === 3}
+            disabled={times === 3 || loading}
             variant="contained"
             className={classes.button}
             onClick={() => {
@@ -129,6 +128,7 @@ const Dashboard: React.FC = () => {
             Puxar carta
           </Button>
           <Button
+            disabled={loading}
             variant="contained"
             className={classes.button}
             onClick={handleShuffleCards}
